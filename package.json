@@ -1,0 +1,19 @@
+{
+  "name": "tubor",
+  "version": "0.0.1",
+  "description": "Fetch YouTube video transcripts/subtitles",
+  "repository": "https://github.com/hallid-ai/tubor",
+  "author": "Hallidai ",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
