@@ -1,4 +1,4 @@
-import { Transcript, TranscriptList, TranscriptDetail } from "./models";
+import { Transcript, TranscriptList } from "./models";
 import { TuborBasicError, ExceptionCode } from "./tuborerror"
 export function extractHtml(html: string): any {
     const splittedHtml = html.split('"captions":')
@@ -53,7 +53,10 @@ export function buildTranscript(captionsJson: any, videoId: string): TranscriptL
     )
 }
 
-export function extractVideoId(input: string): string | null {
+export function extractVideoId(input: string): string {
+    if (input == null || input.trim().length === 0) {
+        throw new TuborBasicError(ExceptionCode.PARAM_ERROR, 'The input is blank, please enter a Youtube video url or a videoId.')
+    }
     if (input.length == 11) {
         return input
     }
@@ -63,8 +66,6 @@ export function extractVideoId(input: string): string | null {
         console.log("YouTube video ID:", videoId);
         return videoId;
     } else {
-        console.log("Failed to retrieve YouTube video ID. Video Url: " + input);
-        // Return null if no match is found
-        return null;
+        throw new TuborBasicError(ExceptionCode.EXTRACT_ERROR, `Failed to retrieve YouTube video ID. Video Url: ${input}`);
     }
 }
