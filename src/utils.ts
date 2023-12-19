@@ -1,17 +1,17 @@
 import { Transcript, TranscriptList, TranscriptDetail } from "./models";
-
+import { TuborBasicError, ExceptionCode } from "./tuborerror"
 export function extractHtml(html: string): any {
     const splittedHtml = html.split('"captions":')
     if (splittedHtml.length <= 1) {
-        throw new Error("Invalid HTML format: 'captions' section not found.");
+        throw new TuborBasicError(ExceptionCode.EXTRACT_ERROR, "Invalid HTML format: 'captions' section not found.");
     }
     const captionJson = JSON.parse(splittedHtml[1].split(',"videoDetails')[0].replace('\n', '')).playerCaptionsTracklistRenderer;
 
     if (captionJson == null) {
-        throw new Error("Invalid JSON: 'playerCaptionsTracklistRenderer' is null.");
+        throw new TuborBasicError(ExceptionCode.EXTRACT_ERROR, "Invalid JSON: 'playerCaptionsTracklistRenderer' is null.");
     }
     if (!('captionTracks' in captionJson)) {
-        throw new Error("Missing 'captionTracks' property in 'playerCaptionsTracklistRenderer'.");
+        throw new TuborBasicError(ExceptionCode.EXTRACT_ERROR, "Missing 'captionTracks' property in 'playerCaptionsTracklistRenderer'.");
     }
     return captionJson
 }
