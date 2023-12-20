@@ -1,5 +1,5 @@
 import { Transcript, TranscriptList } from "./models";
-import { ExceptionCode, InvalidInputError, VideoNotFoundError, ExtractHtmlError } from "./tuborerror"
+import { ExceptionCode, InvalidInputError, VideoNotFoundError, ExtractHtmlError } from "./tubor.error"
 export function extractHtml(html: string): any {
     const splittedHtml = html.split('"captions":')
     if (splittedHtml.length <= 1) {

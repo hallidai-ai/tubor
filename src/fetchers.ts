@@ -3,7 +3,7 @@ import he from 'he';
 import { extractHtml, buildTranscript, extractVideoId } from './utils';
 import { transcriptParser } from './parsers';
 import { TranscriptObject, TranscriptResponse } from './models';
-import { AxiosRequestError, ExceptionCode } from './tuborerror';
+import { AxiosRequestError, ExceptionCode } from './tubor.error';
 
 const WATCH_URL = "https://www.youtube.com/watch?v=";
 
