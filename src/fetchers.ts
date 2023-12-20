@@ -3,15 +3,12 @@ import he from 'he';
 import { extractHtml, buildTranscript, extractVideoId } from './utils';
 import { transcriptParser } from './parsers';
 import { TranscriptObject, TranscriptResponse } from './models';
-import { TuborBasicError, ExceptionCode } from './tuborerror';
+import { AxiosRequestError, ExceptionCode } from './tuborerror';
 
 const WATCH_URL = "https://www.youtube.com/watch?v=";
 
 export async function getTranscripts(input: string): Promise<TranscriptResponse> {
     const videoId = extractVideoId(input)
-    if (videoId == null) {
-        throw new TuborBasicError(ExceptionCode.PARAM_ERROR, "Extract video id error")
-    }
     try {
         const htmlContent = await htmlFetcher(videoId);
         const captionJson = extractHtml(htmlContent);
@@ -49,7 +46,7 @@ export async function htmlFetcher(videoId: string): Promise<string> {
         const response = await axios.get(WATCH_URL + videoId);
         return he.unescape(response.data);
     } catch (error) {
-        throw new TuborBasicError(ExceptionCode.REQUEST_ERROR, `Error fetching HTML from ${WATCH_URL + videoId}: ${error}`)
+        throw new AxiosRequestError(ExceptionCode.REQUEST_ERROR, `Error fetching HTML from ${WATCH_URL + videoId}: ${error}`)
     }
 }
 
@@ -61,6 +58,6 @@ export async function transcriptContestFetcher(url: string): Promise<string> {
         const response = await axios(config);
         return response.data;
     } catch (error) {
-        throw new TuborBasicError(ExceptionCode.REQUEST_ERROR, `Error fetching transcript content from ${url}: ${error}`)
+        throw new AxiosRequestError(ExceptionCode.REQUEST_ERROR, `Error fetching transcript content from ${url}: ${error}`)
     }
 }

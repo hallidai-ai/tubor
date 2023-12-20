@@ -1,7 +1,8 @@
 export const ExceptionCode = {
-    PARAM_ERROR: 'TURBO.BASIC.0001',
+    EMPTY_URL: 'TURBO.BASIC.0001',
     REQUEST_ERROR: 'TURBO.BASIC.0002',
-    EXTRACT_ERROR: 'TURBO.BASIC.0003',
+    MATCH_ERROR: 'TURBO.BASIC.0003',
+    EXTRACT_ERROR: 'TURBO.BASIC.0004',
     DEFAULT_ERROR: 'TURBO.BASIC.9999'
 } as const;
 
@@ -13,10 +14,11 @@ export class TuborBasicError extends Error {
     constructor(code: string = 'BASIC9999', detail: string = '') {
         super()
         this.map = new Map([
-            ['TURBO.BASIC.0001', 'Parameter error'],
+            ['TURBO.BASIC.0001', 'Empty url'],
             ['TURBO.BASIC.0002', 'Request error'],
-            ['TURBO.BASIC.0003', 'Extract error'],
-            ['TURBO.BASIC.9999', 'Default TuborBasicError'],
+            ['TURBO.BASIC.0003', 'Video not found'],
+            ['TURBO.BASIC.0004', 'Extract html error'],
+            ['TURBO.BASIC.9999', 'Default tuborBasicError'],
         ])
         this.detail = detail;
         this.check(code, detail);
@@ -37,3 +39,11 @@ export class TuborBasicError extends Error {
     }
 
 }
+
+export class InvalidInputError extends TuborBasicError {}
+
+export class VideoNotFoundError extends TuborBasicError {}
+
+export class ExtractHtmlError extends TuborBasicError {}
+
+export class AxiosRequestError extends TuborBasicError {}

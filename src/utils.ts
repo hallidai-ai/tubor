@@ -1,17 +1,17 @@
 import { Transcript, TranscriptList } from "./models";
-import { TuborBasicError, ExceptionCode } from "./tuborerror"
+import { ExceptionCode, InvalidInputError, VideoNotFoundError, ExtractHtmlError } from "./tuborerror"
 export function extractHtml(html: string): any {
     const splittedHtml = html.split('"captions":')
     if (splittedHtml.length <= 1) {
-        throw new TuborBasicError(ExceptionCode.EXTRACT_ERROR, "Invalid HTML format: 'captions' section not found.");
+        throw new ExtractHtmlError(ExceptionCode.EXTRACT_ERROR, "Invalid HTML format: 'captions' section not found.");
     }
     const captionJson = JSON.parse(splittedHtml[1].split(',"videoDetails')[0].replace('\n', '')).playerCaptionsTracklistRenderer;
 
     if (captionJson == null) {
-        throw new TuborBasicError(ExceptionCode.EXTRACT_ERROR, "Invalid JSON: 'playerCaptionsTracklistRenderer' is null.");
+        throw new ExtractHtmlError(ExceptionCode.EXTRACT_ERROR, "Invalid JSON: 'playerCaptionsTracklistRenderer' is null.");
     }
     if (!('captionTracks' in captionJson)) {
-        throw new TuborBasicError(ExceptionCode.EXTRACT_ERROR, "Missing 'captionTracks' property in 'playerCaptionsTracklistRenderer'.");
+        throw new ExtractHtmlError(ExceptionCode.EXTRACT_ERROR, "Missing 'captionTracks' property in 'playerCaptionsTracklistRenderer'.");
     }
     return captionJson
 }
@@ -55,7 +55,7 @@ export function buildTranscript(captionsJson: any, videoId: string): TranscriptL
 
 export function extractVideoId(input: string): string {
     if (input == null || input.trim().length === 0) {
-        throw new TuborBasicError(ExceptionCode.PARAM_ERROR, 'The input is blank, please enter a Youtube video url or a videoId.')
+        throw new InvalidInputError(ExceptionCode.EMPTY_URL, 'The input is blank, please enter a Youtube video url or a videoId.')
     }
     if (input.length == 11) {
         return input
@@ -66,6 +66,6 @@ export function extractVideoId(input: string): string {
         console.log("YouTube video ID:", videoId);
         return videoId;
     } else {
-        throw new TuborBasicError(ExceptionCode.EXTRACT_ERROR, `Failed to retrieve YouTube video ID. Video Url: ${input}`);
+        throw new VideoNotFoundError(ExceptionCode.MATCH_ERROR, `Failed to retrieve YouTube video ID. Video Url: ${input}`);
     }
 }
