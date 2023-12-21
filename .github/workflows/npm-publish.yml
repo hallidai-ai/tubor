@@ -1,0 +1,35 @@
+name: Publish npm package
+
+on:
+  push:
+    branches:
+      - main  # Adjust to your default branch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  
+          registry-url: "https://registry.npmjs.org"
+          cache: yarn
+
+      - name: Install Dependencies with Yarn
+        run: yarn install
+
+      - name: Build TypeScript
+        run: yarn build  # Ensure this script is defined in your package.json
+
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: yarn run publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
