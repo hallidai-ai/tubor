@@ -2,7 +2,10 @@
   "name": "tubor",
   "version": "0.0.9",
   "description": "Fetch YouTube video transcripts",
-  "repository": "git+https://github.com/hallid-ai/tubor.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hallid-ai/tubor.git"
+  },
   "author": "Hallidai",
   "license": "MIT",
   "main": "dist/main.js",
