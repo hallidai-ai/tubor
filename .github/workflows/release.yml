@@ -1,0 +1,48 @@
+name: Release Workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  
+          registry-url: "https://registry.npmjs.org"
+          cache: yarn
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Check if PR is Merged into Main
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+        run: echo "PR merged into main"
+
+      - name: Check if Direct Push to Main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: echo "Direct push to main"
+
+      - name: Use Changesets to Version and Publish
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
