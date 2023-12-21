@@ -17,6 +17,7 @@
     "access": "public"
   },
   "scripts": {
+    "build": "turbo run build",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "publish": "turbo run build && changeset publish"
