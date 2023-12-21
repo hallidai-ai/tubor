@@ -1,6 +1,6 @@
 {
   "name": "tubor",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Fetch YouTube video transcripts",
   "repository": "git+https://github.com/hallid-ai/tubor.git",
   "author": "Hallidai",
