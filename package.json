@@ -1,6 +1,6 @@
 {
   "name": "tubor",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Fetch YouTube video transcripts",
   "repository": {
     "type": "git",
