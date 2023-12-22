@@ -40,7 +40,7 @@ export function buildTranscript(captionsJson: any, videoId: string): TranscriptL
     }),
   );
 
-  const manuallyCreatedTranscripts: { [languageCode: string]: Transcript }[] = [];
+  const manuallyCreatedTranscripts: { [languageCode: string]: Transcript } = {};
   const generatedTranscripts: { [languageCode: string]: Transcript } = {};
   const transcriptObject: { [languageCode: string]: Transcript } = {};
 
@@ -56,8 +56,7 @@ export function buildTranscript(captionsJson: any, videoId: string): TranscriptL
     if (caption.kind === 'asr') {
       generatedTranscripts[caption.languageCode] = transcriptDict;
     } else {
-      transcriptObject[caption.languageCode] = transcriptDict;
-      manuallyCreatedTranscripts.push(transcriptObject);
+      manuallyCreatedTranscripts[caption.languageCode] = transcriptDict
     }
   }
 
