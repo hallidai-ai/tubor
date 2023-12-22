@@ -3,13 +3,13 @@
 export class TranscriptResponse {
   public videoId: string;
   public status: string;
-  public manuallyCreatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] }[];
+  public manuallyCreatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] };
   public generatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] };
 
   constructor(
     videoId: string,
     status: string,
-    manuallyCreatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] }[],
+    manuallyCreatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] },
     generatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] },
   ) {
     this.videoId = videoId;
@@ -46,12 +46,12 @@ export class Transcript {
 
 export class TranscriptList {
   public videoId: string;
-  public manuallyCreatedTranscripts: { [languageCode: string]: Transcript }[];
+  public manuallyCreatedTranscripts: { [languageCode: string]: Transcript };
   public generatedTranscripts: { [languageCode: string]: Transcript };
 
   constructor(
     videoId: string,
-    manuallyCreatedTranscripts: { [languageCode: string]: Transcript }[],
+    manuallyCreatedTranscripts: { [languageCode: string]: Transcript },
     generatedTranscripts: { [languageCode: string]: Transcript },
   ) {
     this.videoId = videoId;

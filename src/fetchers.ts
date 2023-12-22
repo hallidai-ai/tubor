@@ -15,16 +15,16 @@ export async function getTranscripts(input: string): Promise<TranscriptResponse>
     const captionJson = extractHtml(htmlContent);
     const transcriptList = buildTranscript(captionJson, videoId);
 
-    const manuallyCreatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] }[] = [];
+    const manuallyCreatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] } = {};
     const generatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] } = {};
-    for (const transcriptObject of transcriptList.manuallyCreatedTranscripts) {
-      for (const languageCode in transcriptObject) {
-        const transcript = transcriptObject[languageCode];
-        const baseUrl = transcript.baseUrl;
-        const responseData = await transcriptContestFetcher(baseUrl);
-        const result: TranscriptObject[] = transcriptParser(responseData);
-        manuallyCreatedTranscriptsContents.push({ [languageCode]: result });
-      }
+    if (Object.keys(transcriptList.manuallyCreatedTranscripts).length > 0) {
+        for (const lang of Object.keys(transcriptList.manuallyCreatedTranscripts)) {
+            const manuallyTranscript = transcriptList.manuallyCreatedTranscripts[lang];
+            const baseUrl = manuallyTranscript.baseUrl;
+            const responseData = await transcriptContestFetcher(baseUrl);
+            const result: TranscriptObject[] = transcriptParser(responseData);
+            manuallyCreatedTranscriptsContents[lang] = result
+        }
     }
     if (Object.keys(transcriptList.generatedTranscripts).length > 0) {
       // there are only one generatedTranscripts
