@@ -3,6 +3,7 @@ export const ExceptionCode = {
   REQUEST_ERROR: 'TURBO.BASIC.0002',
   MATCH_ERROR: 'TURBO.BASIC.0003',
   EXTRACT_ERROR: 'TURBO.BASIC.0004',
+  CAN_NOT_FIND_TRANSCRIPT: 'TURBO.BASIC.0005',
   DEFAULT_ERROR: 'TURBO.BASIC.9999',
 } as const;
 
@@ -18,6 +19,7 @@ export class TuborBasicError extends Error {
       ['TURBO.BASIC.0002', 'Request error'],
       ['TURBO.BASIC.0003', 'Video not found'],
       ['TURBO.BASIC.0004', 'Extract html error'],
+      ['TURBO.BASIC.0005', 'This youtube video does not have transcript'],
       ['TURBO.BASIC.9999', 'Default tuborBasicError'],
     ]);
     this.detail = detail;

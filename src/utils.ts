@@ -9,8 +9,8 @@ export function extractHtml(html: string): any {
   const splittedHtml = html.split('"captions":');
   if (splittedHtml.length <= 1) {
     throw new ExtractHtmlError(
-      ExceptionCode.EXTRACT_ERROR,
-      "Invalid HTML format: 'captions' section not found.",
+      ExceptionCode.CAN_NOT_FIND_TRANSCRIPT,
+      "Invalid HTML format: 'captions' section not found.This youtube video does not have corresponding transcript",
     );
   }
   const captionJson = JSON.parse(
