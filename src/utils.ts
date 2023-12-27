@@ -5,8 +5,26 @@ import {
   InvalidInputError,
   VideoNotFoundError,
 } from './tubor.error';
+import * as cheerio from 'cheerio';
+import { unescape } from 'he';
+
+export function isUTubeVideoLive(data: string): boolean {
+  const $ = cheerio.load(data);
+  const isLiveBroadcast = $('.ytp-live').length > 0;
+  if (isLiveBroadcast) {
+    return true;
+  }
+  return false;
+}
+
 export function extractHtml(html: string): any {
-  const splittedHtml = html.split('"captions":');
+  if (isUTubeVideoLive(html)) {
+    throw new ExtractHtmlError(
+      ExceptionCode.NO_TRANSCRIPT_FOR_LIVE_VIDEO,
+      `Invalid HTML content:  This Youtube video is a live broadcast, it does not have transcript`,
+    );
+  }
+  const splittedHtml = unescape(html).split('"captions":');
   if (splittedHtml.length <= 1) {
     throw new ExtractHtmlError(
       ExceptionCode.CAN_NOT_FIND_TRANSCRIPT,
@@ -43,7 +61,6 @@ export function buildTranscript(captionsJson: any, videoId: string): TranscriptL
   const manuallyCreatedTranscripts: { [languageCode: string]: Transcript } = {};
   const generatedTranscripts: { [languageCode: string]: Transcript } = {};
   const transcriptObject: { [languageCode: string]: Transcript } = {};
-
   for (const caption of captionsJson.captionTracks) {
     const transcriptDict = new Transcript(
       videoId,
@@ -74,7 +91,7 @@ export function extractVideoId(input: string): string {
     return input;
   }
   const match = input.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|watch\?.+?&amp;v=))([^"&?\/\s]{11})/,
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|watch\?.+?&amp;v=|live\/))([^"&?\/\s]{11})/,
   );
   if (match && match[1]) {
     const videoId: string = match[1];

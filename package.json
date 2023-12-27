@@ -1,6 +1,6 @@
 {
   "name": "tubor",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Fetch YouTube video transcripts",
   "repository": {
     "type": "git",
@@ -40,6 +40,7 @@
     "@types/he": "^1.2.3",
     "@types/xml-js": "^1.0.0",
     "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
     "he": "^1.2.0",
     "xml-js": "^1.6.11"
   }
