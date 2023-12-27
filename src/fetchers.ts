@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { unescape } from 'he';
 
 import { TranscriptObject, TranscriptResponse } from './models';
 import { transcriptParser } from './parsers';
@@ -18,13 +17,13 @@ export async function getTranscripts(input: string): Promise<TranscriptResponse>
     const manuallyCreatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] } = {};
     const generatedTranscriptsContents: { [languageCode: string]: TranscriptObject[] } = {};
     if (Object.keys(transcriptList.manuallyCreatedTranscripts).length > 0) {
-        for (const lang of Object.keys(transcriptList.manuallyCreatedTranscripts)) {
-            const manuallyTranscript = transcriptList.manuallyCreatedTranscripts[lang];
-            const baseUrl = manuallyTranscript.baseUrl;
-            const responseData = await transcriptContestFetcher(baseUrl);
-            const result: TranscriptObject[] = transcriptParser(responseData);
-            manuallyCreatedTranscriptsContents[lang] = result
-        }
+      for (const lang of Object.keys(transcriptList.manuallyCreatedTranscripts)) {
+        const manuallyTranscript = transcriptList.manuallyCreatedTranscripts[lang];
+        const baseUrl = manuallyTranscript.baseUrl;
+        const responseData = await transcriptContestFetcher(baseUrl);
+        const result: TranscriptObject[] = transcriptParser(responseData);
+        manuallyCreatedTranscriptsContents[lang] = result
+      }
     }
     if (Object.keys(transcriptList.generatedTranscripts).length > 0) {
       // there are only one generatedTranscripts
@@ -42,22 +41,23 @@ export async function getTranscripts(input: string): Promise<TranscriptResponse>
       generatedTranscriptsContents,
     );
   } catch (error) {
-    console.log(error);
     throw error;
   }
 }
 
 // Get the content of utube page html
 export async function htmlFetcher(videoId: string): Promise<string> {
+  let responseData;
   try {
     const response = await axios.get(WATCH_URL + videoId);
-    return unescape(response.data);
+    responseData = response.data;
   } catch (error) {
     throw new AxiosRequestError(
       ExceptionCode.REQUEST_ERROR,
       `Error fetching HTML from ${WATCH_URL + videoId}: ${error}`,
     );
   }
+  return responseData;
 }
 
 // Get the transcript xml content
