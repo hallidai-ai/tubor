@@ -5,13 +5,18 @@ import {
   InvalidInputError,
   VideoNotFoundError,
 } from './tubor.error';
-import * as cheerio from 'cheerio';
 import { unescape } from 'he';
 
 export function isUTubeVideoLive(data: string): boolean {
-  const $ = cheerio.load(data);
-  const isLiveBroadcast = $('.ytp-live').length > 0;
-  if (isLiveBroadcast) {
+  const splitStartDate = data.split('startDate');
+  const splitEndDate = data.split('endDate');
+  /**
+   * case1: When there is startDate but no endDate, it is judged as Live. Return true.
+   * case2: When there is no startDate , it is not a live. Return false.
+   * case3: When there are both startDate and endDate, this is a live that has ended. Return false.
+   * case4: When there is no startDate and endDate at the same time, this is a normal video. Return false.
+   */
+  if ( splitStartDate.length > 1 && splitEndDate.length === 1) {
     return true;
   }
   return false;
