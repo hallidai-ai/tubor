@@ -6,6 +6,8 @@ import { AxiosRequestError, ExceptionCode } from './tubor.error';
 import { buildTranscript, extractHtml, extractVideoId } from './utils';
 
 const WATCH_URL = 'https://www.youtube.com/watch?v=';
+const USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36,gzip(gfe)';
 
 export async function getTranscripts(input: string): Promise<TranscriptResponse> {
   const videoId = extractVideoId(input);
@@ -22,7 +24,7 @@ export async function getTranscripts(input: string): Promise<TranscriptResponse>
         const baseUrl = manuallyTranscript.baseUrl;
         const responseData = await transcriptContestFetcher(baseUrl);
         const result: TranscriptObject[] = transcriptParser(responseData);
-        manuallyCreatedTranscriptsContents[lang] = result
+        manuallyCreatedTranscriptsContents[lang] = result;
       }
     }
     if (Object.keys(transcriptList.generatedTranscripts).length > 0) {
@@ -49,7 +51,12 @@ export async function getTranscripts(input: string): Promise<TranscriptResponse>
 export async function htmlFetcher(videoId: string): Promise<string> {
   let responseData;
   try {
-    const response = await axios.get(WATCH_URL + videoId);
+    const response = await axios.get(WATCH_URL + videoId, {
+      headers: {
+        'Accept-Language': 'en-US',
+        'User-Agent': USER_AGENT,
+      },
+    });
     responseData = response.data;
   } catch (error) {
     throw new AxiosRequestError(
