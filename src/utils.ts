@@ -1,3 +1,5 @@
+import { unescape } from 'he';
+
 import { Transcript, TranscriptList } from './models';
 import {
   ExceptionCode,
@@ -5,7 +7,6 @@ import {
   InvalidInputError,
   VideoNotFoundError,
 } from './tubor.error';
-import { unescape } from 'he';
 
 export function isUTubeVideoLive(data: string): boolean {
   const splitStartDate = data.split('startDate');
@@ -16,7 +17,7 @@ export function isUTubeVideoLive(data: string): boolean {
    * case3: When there are both startDate and endDate, this is a live that has ended. Return false.
    * case4: When there is no startDate and endDate at the same time, this is a normal video. Return false.
    */
-  if ( splitStartDate.length > 1 && splitEndDate.length === 1) {
+  if (splitStartDate.length > 1 && splitEndDate.length === 1) {
     return true;
   }
   return false;
@@ -29,11 +30,12 @@ export function extractHtml(html: string): any {
       `Invalid HTML content:  This Youtube video is a live broadcast, it does not have transcript`,
     );
   }
-  const splittedHtml = unescape(html).split('"captions":');
+  const unescapedHtml = unescape(html);
+  const splittedHtml = unescapedHtml.split('"captions":');
   if (splittedHtml.length <= 1) {
     throw new ExtractHtmlError(
       ExceptionCode.CAN_NOT_FIND_TRANSCRIPT,
-      "Invalid HTML format: 'captions' section not found.This youtube video does not have corresponding transcript",
+      `Invalid HTML format: 'captions' section not found.This youtube video does not have corresponding transcript. ${unescapedHtml}`,
     );
   }
   const captionJson = JSON.parse(
@@ -78,7 +80,7 @@ export function buildTranscript(captionsJson: any, videoId: string): TranscriptL
     if (caption.kind === 'asr') {
       generatedTranscripts[caption.languageCode] = transcriptDict;
     } else {
-      manuallyCreatedTranscripts[caption.languageCode] = transcriptDict
+      manuallyCreatedTranscripts[caption.languageCode] = transcriptDict;
     }
   }
 
