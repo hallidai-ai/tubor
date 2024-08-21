@@ -4,15 +4,14 @@ import { TranscriptObject, TranscriptResponse } from './models';
 import { transcriptParser } from './parsers';
 import { AxiosRequestError, ExceptionCode } from './tubor.error';
 import { buildTranscript, extractHtml, extractVideoId } from './utils';
-
 const WATCH_URL = 'https://www.youtube.com/watch?v=';
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36,gzip(gfe)';
 
-export async function getTranscripts(input: string): Promise<TranscriptResponse> {
+export async function getTranscripts(input: string, spiderApiKey?: string): Promise<TranscriptResponse> {
   const videoId = extractVideoId(input);
   try {
-    const htmlContent = await htmlFetcher(videoId);
+    const htmlContent = await htmlFetcher(videoId, spiderApiKey);
     const captionJson = extractHtml(htmlContent);
     const transcriptList = buildTranscript(captionJson, videoId);
 
@@ -48,24 +47,88 @@ export async function getTranscripts(input: string): Promise<TranscriptResponse>
 }
 
 // Get the content of utube page html
-export async function htmlFetcher(videoId: string): Promise<string> {
+export async function htmlFetcher(videoId: string, spiderApiKey?: string): Promise<string> {
   let responseData;
   try {
-    const response = await axios.get(WATCH_URL + videoId, {
-      headers: {
-        'Accept-Language': 'en-US',
+    if (spiderApiKey) {
+      console.log('Using spider to fetch html');
+      const response = await scrapeWebpage(WATCH_URL + videoId, spiderApiKey);
+      return response.content;
+    } else {
+      const headers = {
         'User-Agent': USER_AGENT,
-      },
-    });
-    responseData = response.data;
+      };
+      const config: AxiosRequestConfig = { headers, method: 'get', url: WATCH_URL + videoId };
+      const response = await axios(config);
+      responseData = response.data;
+      return responseData;
+    }
   } catch (error) {
     throw new AxiosRequestError(
       ExceptionCode.REQUEST_ERROR,
       `Error fetching HTML from ${WATCH_URL + videoId}: ${error}`,
     );
   }
-  return responseData;
 }
+
+export async function scrapeWebpage(url: string, spiderApiKey: string): Promise<any> {
+    const headers = {
+      Authorization: `Bearer ${spiderApiKey}`,
+      'Content-Type': 'application/json',
+    };
+    const body = JSON.stringify({
+      limit: 1,
+      request: 'http',
+      url: url,
+      return_format: 'raw',
+      Proxy: 'auto',
+    });
+
+    const maxRetries = 3;
+    let retries = 0;
+    let success = false;
+    let data;
+
+    // TODO: sending retry event to client
+    while (retries < maxRetries && !success) {
+      try {
+        console.log(`Attempt ${retries + 1} to scrape ${url}`);
+        const response = await fetch('https://api.spider.cloud/crawl', {
+          method: 'POST',
+          headers: headers,
+          body: body,
+        });
+
+        if (!response.ok) {
+          console.error(`HTTP error! status: ${response.status}`);
+          return undefined;
+        }
+        data = await response.json();
+        if (!data || !data.length || !data[0] || !data[0].content) {
+          console.log(`No content found for ${url} will retry`);
+          throw new Error('No content found');
+        }
+        success = true;
+      } catch (error) {
+        console.error(`Attempt ${retries + 1} failed - ${error}`);
+        retries++;
+        if (retries === maxRetries) {
+          console.log(`Max retries reached scraping ${url} - ${error}`);
+          return undefined;
+        }
+      }
+    }
+    // if the response is empty, return null
+    if (!data || !data.length || !data[0] || !data[0].content) {
+      console.log(`No content found for ${url}`);
+      return undefined;
+    }
+    // data[0].content = await this.cleanupWebpage(data[0].content);
+
+    console.log(`Successfully scraped ${url}`);
+
+    return data[0];
+  }
 
 // Get the transcript xml content
 export async function transcriptContestFetcher(url: string): Promise<string> {
